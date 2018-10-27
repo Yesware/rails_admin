@@ -87,7 +87,12 @@ module RailsAdmin
         end
 
         def length_validation_lookup
-          shortest = model.validators.select { |validator| validator.respond_to?(:attributes) && validator.attributes.include?(name.to_sym) && validator.kind == :length && validator.options[:maximum] }.min do |a, b|
+          shortest = model.validators.select do |validator|
+            validator.respond_to?(:attributes)          &&
+            validator.attributes.include?(name.to_sym)  &&
+            validator.kind == :length                   &&
+            validator.options[:maximum]
+          end.min do |a, b|
             a.options[:maximum] <=> b.options[:maximum]
           end
 

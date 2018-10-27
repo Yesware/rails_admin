@@ -19,6 +19,7 @@ module RailsAdmin
       def new(m)
         m = m.constantize unless m.is_a?(Class)
         (am = old_new(m)).model && am.adapter ? am : nil
+
       rescue LoadError, NameError
         puts "[RailsAdmin] Could not load model #{m}, assuming model is non existing. (#{$ERROR_INFO})" unless Rails.env.test?
         nil
@@ -50,6 +51,8 @@ module RailsAdmin
         initialize_active_record
       elsif ancestors.include?('Mongoid::Document')
         initialize_mongoid
+      elsif ancestors.include?('MongoMapper::Document')
+        initialize_mongomapper
       end
     end
 
@@ -108,6 +111,12 @@ module RailsAdmin
       @adapter = :mongoid
       require 'rails_admin/adapters/mongoid'
       extend Adapters::Mongoid
+    end
+
+    def initialize_mongomapper
+      @adapter = :mongomapper
+      require 'rails_admin/adapters/mongomapper'
+      extend Adapters::MongoMapper
     end
 
     def parse_field_value(field, value)
